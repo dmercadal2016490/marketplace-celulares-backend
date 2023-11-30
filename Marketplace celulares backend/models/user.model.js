@@ -10,7 +10,9 @@ var esquemaUsuario = esquema({
     password: String,
     email : String,
     role: String,
-    image: String
+    image: String,
+    ventas: [{type: esquema.ObjectId, ref: 'venta'}],
+    compras: [{type: esquema.ObjectId, ref: 'compra'}]
 })
 
 module.exports = mongoose.model('user', esquemaUsuario)

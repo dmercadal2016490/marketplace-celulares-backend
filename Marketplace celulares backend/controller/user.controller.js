@@ -44,6 +44,10 @@ function crearAdmin(req, res){
     })
 }
 
+function registrar(req, res){
+    
+}
+
 module.exports={
     crearAdmin 
 }
