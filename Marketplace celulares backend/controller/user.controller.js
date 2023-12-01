@@ -1,6 +1,7 @@
 'use strict'
 
 var User = require('../models/user.model');
+var Code = require('../models/codigo.model');
 var bcrypt = require('bcrypt-nodejs');
 var fs = require('fs');
 var path = require('path');
@@ -167,6 +168,188 @@ function deleteUser(req,res){
     }
 }
 
+function updateUser(req,res){
+    var userId = req.params.idU;
+    var params = req.body;
+    var emailV = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+
+    if(userId != req.user.sub){
+        res.status(403).send({message: 'No tienes permisos para editar a otro usuario'});
+    }else{
+        if(params.email){
+            if(emailV.test(params.email)){
+                if(params.username){
+                    User.findOne({username: params.username.toLowerCase()},(err, userFound)=>{
+                        if(err){
+                            res.status(500).send({message: 'Error general al buscar el usuario'});
+                            console.log(err);
+                        }else if(userFound){
+                            res.send({message: 'Nombre de usuario ya en uso'});
+                        }else{
+                            User.findByIdAndUpdate(userId, params, {new: true}, (err, userUpdated)=>{
+                                if(err){
+                                    res.status(500).send({message: 'Error general al actualizar el usuario'});
+                                    console.log(err);
+                                }else if(userUpdated){
+                                   res.send({message: 'Usuario actualizado', userUpdated}); 
+                                }else{
+                                    res.status(401).send({message: 'No se actualizo el usuario'});
+                                }
+                            })
+                        }
+                    })
+                }else{
+                    User.findByIdAndUpdate(userId, params, {new: true}, (err, userUpdated)=>{
+                        if(err){
+                            res.status(500).send({message: 'Error general al actualizar el usuario'});
+                            console.log(err);
+                        }else if(userUpdated){
+                           res.send({message: 'Usuario actualizado', userUpdated}); 
+                        }else{
+                            res.status(401).send({message: 'No se actualizo el usuario'});
+                        }
+                    }) 
+                }
+            }else{
+                res.send({message: 'Direccion de correo invalida'}); 
+            }
+        }else{
+            if(params.username){
+                User.findOne({username: params.username.toLowerCase()},(err, userFound)=>{
+                    if(err){
+                        res.status(500).send({message: 'Error general al buscar el usuario'});
+                        console.log(err);
+                    }else if(userFound){
+                        res.send({message: 'Nombre de usuario ya en uso'});
+                    }else{
+                        User.findByIdAndUpdate(userId, params, {new: true}, (err, userUpdated)=>{
+                            if(err){
+                                res.status(500).send({message: 'Error general al actualizar el usuario'});
+                                console.log(err);
+                            }else if(userUpdated){
+                               res.send({message: 'Usuario actualizado', userUpdated}); 
+                            }else{
+                                res.status(401).send({message: 'No se actualizo el usuario'});
+                            }
+                        })
+                    }
+                })
+            }else{
+                User.findByIdAndUpdate(userId, params, {new: true}, (err, userUpdated)=>{
+                    if(err){
+                        res.status(500).send({message: 'Error general al actualizar el usuario'});
+                        console.log(err);
+                    }else if(userUpdated){
+                       res.send({message: 'Usuario actualizado', userUpdated}); 
+                    }else{
+                        res.status(401).send({message: 'No se actualizo el usuario'});
+                    }
+                }) 
+            }
+        }
+    }
+}
+
+function generarCodigo(req, res){
+    var code = new Code();
+    const generateRandomString =
+    (num) => {
+      const characters =
+          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result1 = Math.random().toString(36).substring(0, num);
+
+      return result1;
+    }
+
+    var resultado = generateRandomString(6);
+    Code.findOne({codigo : resultado}, (err, codigoFound)=>{
+        if(err){
+            res.status(500).send({mesaage: 'Error general al buscar el codigo'});
+            console.log(err);
+        }else if(codigoFound){
+            res.send({message: 'Codigo ya en uso'});
+        }else{
+            code.codigo = resultado;
+
+            code.save((err, codeSaved)=>{
+                if(err){
+                    res.status(500).send({mesaage: 'Error general al guardar el codigo'});
+                    console.log(err);
+                }else if(codeSaved){
+                    res.send({mesaage: 'Codigo: ', resultado})
+                }else{
+                    res.send({mesaage: 'No se guardo el codigo'});
+                }
+            })
+        }
+    })
+}
+
+function cambiarContra(req,res){
+    var userId = req.params.idU;
+    var params = req.body;
+
+    if(userId != req.user.sub){
+        res.status(403).send({message: 'No tienes permisos para cambiar la contraseña de otro usuario'});
+    }else{
+        if(params.password){
+            if(params.codigo){
+                Code.findOne({codigo: params.codigo}, (err, codeFound)=>{
+                    if(err){
+                        res.status(500).send({mesaage: 'Error general al buscar el codigo'});
+                        console.log(err);
+                    }else if(codeFound){
+                        User.findById(userId, (err, userFound)=>{
+                            if(err){
+                                res.status(500).send({mesaage: 'Error general al buscar el usuario'});
+                                console.log(err);
+                            }else if(userFound){
+                                bcrypt.hash(params.password, null, null, (err, passwordHashed)=>{
+                                    if(err){
+                                        res.status(500).send({mesaage: 'Error general al encriptar la contraseña'});
+                                        console.log(err);  
+                                    }else if(passwordHashed){
+                                        User.findByIdAndUpdate(userId, {password: passwordHashed}, {new:true}, (err, passwordUpdated)=>{
+                                            if(err){
+                                                res.status(500).send({mesaage: 'Error general al guardar la contraseña'});
+                                                console.log(err);
+                                            }else if(passwordUpdated){
+                                                res.send({mesaage: 'Contraseña actualizada: ', passwordUpdated});
+                                                Code.findOneAndDelete({codigo: params.codigo}, (err, codeDeleted)=>{
+                                                    if(err){
+                                                        res.status(500).send({mesaage: 'Error general al eliminar el codigo'});
+                                                        console.log(err);
+                                                    }else if(codeDeleted){
+                                                        console.log('Codigo Eliminado');
+                                                    }else{
+                                                        res.status(401).send({mesaage: 'No se elimino el codigo'});
+                                                    }
+                                                })
+                                            }else{
+                                                res.status(401).send({mesaage: 'No se guardo la contraseña'})
+                                            }
+                                        })
+                                    }else{
+                                        res.status(401).send({mesaage: 'No se encripto la contraseña'});
+                                    }
+                                })
+                            }else{
+                                res.status(404).send({mesaage: 'No se econtro al usuario'});
+                            }
+                        })
+                    }else{
+                        res.status(404).send({mesaage: 'Codigo incorrecto'})
+                    }
+                })
+            }else{
+                res.send({mesaage: 'Porfavor introduce el codigo'})
+            }
+        }else{
+            res.send({message: 'Solo actualizar contraseña'});
+        }
+    }  
+}
+
 function subirImagen(req,res){
     var userId = req.params.id;
     var update = req.body;
@@ -245,5 +428,8 @@ module.exports={
     subirImagen,
     getImage,
     getUsers, 
-    deleteUser
+    deleteUser,
+    updateUser,
+    generarCodigo,
+    cambiarContra
 }

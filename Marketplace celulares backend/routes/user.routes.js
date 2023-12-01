@@ -12,6 +12,10 @@ api.post('/saveUser', userController.registrar);
 api.post('/login', userController.login);
 api.get('/getUsers', userController.getUsers);
 api.delete('/deleteUser/:idU', mdAuth.ensureAuth, userController.deleteUser);
+api.put('/updateUser/:idU', mdAuth.ensureAuth, userController.updateUser);
+api.put('/actualizarContra/:idU', mdAuth.ensureAuth, userController.cambiarContra);
+api.post('/generarCodigo', userController.generarCodigo);
+//api.post('/cambiarContra', );
 
 //Imagenes
 api.put('/:id/subirImagen', [mdAuth.ensureAuth, upload], userController.subirImagen);
