@@ -1,0 +1,20 @@
+'use strict'
+
+var express = require('express');
+var userController = require('../controller/user.controller');
+var connectMultiparty = require('connect-multiparty');
+var mdAuth = require('../middlewares/autenticacion');
+const upload = connectMultiparty({uploadDir: './uploads/user'})
+
+var api = express.Router();
+
+api.post('/saveUser', userController.registrar);
+api.post('/login', userController.login);
+api.get('/getUsers', userController.getUsers);
+api.delete('/deleteUser/:idU', mdAuth.ensureAuth, userController.deleteUser);
+
+//Imagenes
+api.put('/:id/subirImagen', [mdAuth.ensureAuth, upload], userController.subirImagen);
+api.get('/getImage/:fileName', [upload], userController.getImage)
+
+module.exports = api;
