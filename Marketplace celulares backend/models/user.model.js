@@ -11,7 +11,7 @@ var esquemaUsuario = esquema({
     email : String,
     role: String,
     image: String,
-    ventas: [{type: esquema.ObjectId, ref: 'venta'}],
+    //ventas: [{type: esquema.ObjectId, ref: 'venta'}],
     compras: [{type: esquema.ObjectId, ref: 'compra'}]
 })
 

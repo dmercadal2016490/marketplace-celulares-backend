@@ -379,15 +379,15 @@ function subirImagen(req,res){
                             res.status(400).send({message: 'No se ha podido actualizar'});
                         }
                     })
-                }else{
-                    fs.unlink(filePath, (err)=>{
-                        if(err){
-                            res.status(500).send({message: 'Extensión no válida y error al eliminar archivo'});
-                        }else{
-                            res.send({message: 'Extensión no válida'})
-                        }
-                    })
-                }
+            }else{
+                fs.unlink(filePath, (err)=>{
+                    if(err){
+                        res.status(500).send({message: 'Extensión no válida y error al eliminar archivo'});
+                    }else{
+                        res.send({message: 'Extensión no válida'})
+                    }
+                })
+            }
         }else{
             res.status(400).send({message: 'No hay archivo para subir'});
         }

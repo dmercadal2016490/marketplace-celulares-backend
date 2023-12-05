@@ -11,6 +11,8 @@ var esuqemaTelefono = esquema({
     bateria : String,
     precio : Number,
     unidades: Number,
+    publicado: Date,
+    image : String,
     vendedor : [{type: esquema.ObjectId, ref: 'user'}]
 })
 
