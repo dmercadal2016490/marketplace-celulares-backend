@@ -303,6 +303,25 @@ function deleteTransaccion(req,res){
     }
 }
 
+function getTransacciones(req,res){
+    var userId = req.params.idU;
+    
+    if(userId != req.user.sub){
+        res.status(403).send({message: 'No tienes permisos para ver las transacciones'});
+    }else{
+        Transaccion.find({}).exec((err, transacciones)=>{
+            if(err){
+                res.status.send({message: 'Error general al buscar transacciones'});
+                console.log(err);
+            }else if(transacciones){
+                res.send({message: 'Transacciones registradas: ', transacciones});
+            }else{
+                res.status(404).send({message: 'No se encontraron transacciones'});
+            }
+        })
+    }
+}
+
 module.exports={
     addPhone,
     deletePhone,
@@ -310,5 +329,6 @@ module.exports={
     updatePhone,
     phoneImage,
     getImage,
-    deleteTransaccion
+    deleteTransaccion,
+    getTransacciones
 }

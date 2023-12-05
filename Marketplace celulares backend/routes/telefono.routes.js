@@ -18,7 +18,8 @@ api.put('/subirImagen/:idU/:idP', [upload], phoneController.phoneImage);
 api.get('/getPhoneImage/:fileName', [upload], phoneController.getImage);
 
 //Admin
-api.delete('/deleteTrans//:idU/:idT', [mdAuth.ensureAuth, mdAuth.ensureAuthAdmin], phoneController.deleteTransaccion);;
+api.delete('/deleteTrans/:idU/:idT', [mdAuth.ensureAuth, mdAuth.ensureAuthAdmin], phoneController.deleteTransaccion);
+api.get('/getTrasacciones/idU', [mdAuth.ensureAuth, mdAuth.ensureAuthAdmin], phoneController.getTransacciones)
 
 module.exports = api;
 

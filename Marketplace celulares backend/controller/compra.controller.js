@@ -102,8 +102,60 @@ function comprar(req, res){
     }
 }
 
+function getMyCompras(req,res){
+    var userId = req.params.idU;
 
+    if(userId != req.user.sub){
+        res.status(403).send({message: 'No tienes permisos'});
+    }else{
+    User.findById(userId).populate({path:'compras', populate:{path:'compras'}}).exec((err,compras)=>{
+        if(err){
+            res.status(500).send({message:'Error general'});
+            console.log(err);
+        }else if(compras){
+            res.send({message: 'compras: ', compras});
+        }else{
+            res.status(404).send({message: 'No tienes compras'});
+        }
+    })
+    }
+}
+
+/*function devolver(req,res){
+    var userId = req.params.idU;
+    var phoneId = req.params.idP;
+    var comprasId = req.params.idC;
+
+    if(userId != req.user.sub){
+        res.status(403).send({message: 'No tienes permisos para regresar un telefono'});
+    }else{
+        User.findById(userId, (err, userFind)=>{
+            if(err){
+                res.status(500).send({message: 'Error general al buscar al usuario'});
+                console.log(err);
+            }else if(userFind){
+                Phone.findById(phoneId, (err, phoneFound)=>{
+                    if(err){
+                        res.status(500).send({message: 'Error general al buscar el telefono'});
+                        console.log(err);
+                    }else if(phoneFound){
+                        Compra.findById(comprasId, (err, compraFound)=>{
+                            res.status(500).send({message: 'Error general al buscar la compra'});
+                            console.log(err);
+                        })
+                    }else{
+                        res.status(404).send({message: 'No se encontro el telefono'});
+                    }
+                })
+            }else{
+                res.status(404).send({message: 'No se encontro al usuario'});
+            }
+        })
+    }
+}*/
 
 module.exports ={
-    comprar
+    comprar,
+    getMyCompras
+    //devolver
 }

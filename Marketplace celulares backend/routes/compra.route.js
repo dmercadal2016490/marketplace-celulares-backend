@@ -9,5 +9,6 @@ const upload = connectMultiparty({uploadDir: './uploads/phone'})
 var api = express.Router();
 
 api.put('/comprar/:idU/:idP', mdAuth.ensureAuth, compraController.comprar);
+api.get('/getMyCompras/:idU', mdAuth.ensureAuth, compraController.getMyCompras);
 
 module.exports = api;
